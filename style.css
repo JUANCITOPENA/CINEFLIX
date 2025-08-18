@@ -1,0 +1,277 @@
+/* ESTILOS GLOBALES Y DE LA INTERFAZ */
+:root {
+    --netflix-red: #E50914;
+    --netflix-black: #141414;
+    --netflix-gray: #808080;
+}
+
+body {
+    background-color: var(--netflix-black);
+    font-family: 'Roboto', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.d-none { display: none !important; }
+
+/* 1. PANTALLA DE PLANES */
+.plan-card {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.plan-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+}
+.plan-card.selected { border: 3px solid var(--netflix-red); }
+.plan-features img { width: 100%; border-radius: 8px; margin-bottom: 1rem; }
+
+/* 3. PANTALLA DE PERFILES */
+.profile-selection-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+#profiles-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+.profile-card { cursor: pointer; text-align: center; transition: transform 0.2s; }
+.profile-card:hover .profile-avatar { border: 4px solid #fff; }
+.profile-card:hover .profile-name { color: #fff; }
+.profile-avatar {
+    width: clamp(100px, 15vw, 150px);
+    height: clamp(100px, 15vw, 150px);
+    border-radius: 8px;
+    border: 4px solid transparent;
+    transition: border 0.2s;
+    object-fit: cover;
+}
+.profile-name { color: var(--netflix-gray); margin-top: 0.5rem; font-size: clamp(1rem, 2vw, 1.2rem); }
+.add-profile-card .profile-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(3rem, 6vw, 5rem);
+    background-color: #333;
+}
+        
+/* 4. INTERFAZ PRINCIPAL */
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: rgba(20, 20, 20, 0);
+    transition: background-color 0.4s ease;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.navbar-scrolled { background-color: var(--netflix-black) !important; }
+
+/* 5. PORTADA HERO */
+#hero-section {
+    position: relative;
+    height: 95vh;
+    color: white;
+    background-size: cover;
+    background-position: center top;
+}
+#hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, var(--netflix-black) 15%, transparent 60%), 
+                linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+}
+.hero-content {
+    position: absolute;
+    bottom: 15%;
+    left: 4%;
+    z-index: 2;
+    max-width: 90%;
+}
+.hero-title {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+}
+.hero-description {
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    max-width: 550px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.rating-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.hero-buttons .btn {
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    padding: 0.5rem 1.5rem;
+}
+
+/* 6. CARRUSELES */
+.category-row { padding: 1rem 0 2rem 4%; }
+.category-title { font-size: clamp(1.2rem, 2.5vw, 1.5rem); font-weight: 700; margin-bottom: 1rem; }
+.movie-carousel { display: flex; overflow-x: auto; overflow-y: hidden; padding-bottom: 1rem; scrollbar-width: none; }
+.movie-carousel::-webkit-scrollbar { display: none; }
+.movie-card {
+    flex: 0 0 auto;
+    width: clamp(120px, 18vw, 200px);
+    margin-right: 10px;
+    background-color: #222;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, z-index 0.3s ease;
+    cursor: pointer;
+}
+.movie-card:hover { transform: scale(1.15); z-index: 10; }
+.movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+.movie-card-info { padding: 1rem; position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; }
+.movie-card:hover .movie-card-info { opacity: 1; }
+.card-buttons button { background-color: rgba(42, 42, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.7); color: white; width: 30px; height: 30px; border-radius: 50%; padding: 0; }
+.card-buttons button:hover { border-color: white; }
+
+/* SKELETON LOADERS */
+.skeleton { background: #333; background: linear-gradient(110deg, #222 8%, #333 18%, #222 33%); border-radius: 5px; background-size: 200% 100%; animation: 1.5s shine linear infinite; }
+.skeleton-card { width: clamp(120px, 18vw, 200px); aspect-ratio: 2/3; }
+.skeleton-hero { height: 95vh; }
+@keyframes shine { to { background-position-x: -200%; } }
+
+/* MODAL */
+.modal-dialog { max-width: 800px; width: 95%; }
+.modal-content { background-color: var(--netflix-black); border-radius: 8px; border: 1px solid #333; }
+.modal-header, .modal-footer { border: none; }
+.modal-body-content { position: relative; }
+.modal-backdrop-image { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px 8px 0 0; }
+.modal-backdrop-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, var(--netflix-black) 20%, transparent 70%); border-radius: 8px 8px 0 0; }
+.modal-title-custom { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: bold; }
+
+/* ✅ REGLA DEL VIDEO CENTRADO Y DEFINITIVA */
+.modal-trailer-container iframe {
+    display: block !important;
+    width: 90% !important;
+    margin: 2rem auto 0 auto !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 8px !important;
+    border: none !important;
+}
+
+/* BÚSQUEDA */
+#search-results {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background-color: rgba(20, 20, 20, 0.95);
+    border: 1px solid #333;
+    border-radius: 0 0 5px 5px;
+    z-index: 1030;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.search-result-item { cursor: pointer; }
+.search-result-item:hover { background-color: #333; }
+
+/* FOOTER */
+footer { padding: 3rem 4%; color: var(--netflix-gray); font-size: 0.9rem; margin-top: 3rem; }
+footer a { color: var(--netflix-gray); text-decoration: none; }
+footer a:hover { color: #fff; text-decoration: underline; }
+
+/* 📱 MEJORAS RESPONSIVE */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: rgba(20, 20, 20, 0.95);
+        padding: 1rem;
+        border-radius: 0 0 8px 8px;
+    }
+}
+@media (max-width: 768px) {
+    #hero-section { height: 60vh; }
+    .hero-content { bottom: 10%; padding-right: 4%; }
+    .hero-description { display: none; }
+    .category-row { padding-left: 1rem; padding-right: 1rem; }
+    .modal-dialog { margin: 0.5rem; width: auto; }
+    #search-input { width: 150px; }
+}
+
+/* ✅ FOOTER MEJORADO */
+.main-footer {
+    padding: 3rem 0;
+    color: var(--netflix-gray);
+    font-size: 0.85rem;
+}
+
+.footer-content {
+    max-width: 980px; /* Ancho máximo como en Netflix */
+}
+
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-links a {
+    color: #fff;
+    transition: color 0.2s ease;
+}
+
+.social-links a:hover {
+    color: var(--netflix-gray);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 1rem;
+}
+
+.footer-column a {
+    display: block;
+    color: var(--netflix-gray);
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer-service-code {
+    font-size: 0.85rem;
+    background: transparent;
+    border: 1px solid var(--netflix-gray);
+    color: var(--netflix-gray);
+}
+
+.footer-service-code:hover {
+    background: transparent;
+    color: #fff;
+    border-color: #fff;
+}
+
+.footer-copyright {
+    font-size: 0.75rem;
+    color: var(--netflix-gray);
+}footer-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en móvil */
+    }

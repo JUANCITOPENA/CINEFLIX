@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <link rel="shortcut icon" href="cinetflix.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cineflix - Clon de Netflix Mejorado</title>
+    
+    <!-- Bootstrap 5.3 y Iconos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. PANTALLA DE ELECCIÓN DE PLAN -->
+    <div id="plan-selection-screen" class="container text-center py-5">
+        <h1 class="display-4 fw-bold mb-4">Elige el plan ideal para ti</h1>
+        <div class="row justify-content-center g-4">
+            <div class="col-md-4 col-lg-3">
+                <div class="card bg-dark text-white plan-card" data-plan="Básico" data-price="7.99"><div class="card-body p-4"><h3 class="card-title fw-bold text-primary">Básico</h3><div class="plan-features my-4"><img src="https://i.postimg.cc/Qd92Y501/plan-basico.png" alt="Características del Plan Básico"></div><h4 class="fw-bold">7,99 €/mes</h4><p class="text-muted">Calidad de vídeo Buena (720p)</p><p class="text-muted">1 dispositivo a la vez</p></div></div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="card bg-dark text-white plan-card" data-plan="Estándar" data-price="12.99"><div class="card-body p-4"><h3 class="card-title fw-bold text-info">Estándar</h3><div class="plan-features my-4"><img src="https://i.postimg.cc/V6f5sytC/plan-estandar.png" alt="Características del Plan Estándar"></div><h4 class="fw-bold">12,99 €/mes</h4><p class="text-muted">Calidad de vídeo Fantástica (1080p)</p><p class="text-muted">2 dispositivos a la vez</p></div></div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="card bg-dark text-white plan-card" data-plan="Premium" data-price="17.99"><div class="card-body p-4"><h3 class="card-title fw-bold text-danger">Premium</h3><div class="plan-features my-4"><img src="https://i.postimg.cc/k47g21b0/plan-premium.png" alt="Características del Plan Premium"></div><h4 class="fw-bold">17,99 €/mes</h4><p class="text-muted">Calidad de vídeo Excepcional (4K+HDR)</p><p class="text-muted">4 dispositivos a la vez</p></div></div>
+            </div>
+        </div>
+        <button id="choose-plan-btn" class="btn btn-danger btn-lg mt-5" disabled>Elegir Plan</button>
+    </div>
+
+    <!-- 2. PANTALLA DE PAGO SIMULADO -->
+    <div id="payment-screen" class="container py-5 d-none">
+        <div class="row justify-content-center"><div class="col-md-6"><h1 class="text-center mb-4">Finalizar Suscripción</h1><div class="card bg-dark"><div class="card-body p-4"><form id="payment-form"><div class="mb-3"><label for="card-name" class="form-label">Nombre en la tarjeta</label><input type="text" class="form-control" id="card-name" required></div><div class="mb-3"><label for="card-number" class="form-label">Número de tarjeta</label><input type="text" class="form-control" id="card-number" placeholder="XXXX XXXX XXXX XXXX" required></div><div class="row"><div class="col-md-6 mb-3"><label for="card-expiry" class="form-label">Fecha de caducidad</label><input type="text" class="form-control" id="card-expiry" placeholder="MM/AA" required></div><div class="col-md-6 mb-3"><label for="card-cvv" class="form-label">CVV</label><input type="text" class="form-control" id="card-cvv" placeholder="123" required></div></div><div class="d-grid"><button type="submit" class="btn btn-danger btn-lg">Pagar y Suscribirse</button></div></form></div></div></div></div>
+    </div>
+
+    <!-- 3. PANTALLA DE SELECCIÓN DE PERFIL -->
+    <div id="profile-selection-screen" class="profile-selection-container d-none">
+        <div class="text-center"><h1 class="display-4 mb-5">¿Quién está viendo ahora?</h1><div id="profiles-container" class="d-flex flex-wrap justify-content-center gap-4"></div><button id="manage-profiles-btn" class="btn btn-outline-secondary mt-5">Administrar Perfiles</button></div>
+    </div>
+
+    <!-- 4. INTERFAZ PRINCIPAL DE LA APP -->
+    <div id="main-app-screen" class="d-none">
+        <nav id="navbar" class="navbar navbar-expand-lg navbar-dark navbar-sticky">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#" data-page="home">
+                    <img src="cinetflix1.png" alt="Cineflix logo" class="logo" style="height: 40px; width: auto;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="#" data-page="home">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="catalog" data-filter="popular">Populares</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="catalog" data-filter="trending">Tendencias</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-page="my-list">Mi Lista</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Géneros</a>
+                            <ul id="genres-dropdown" class="dropdown-menu"></ul>
+                        </li>
+                         <li class="nav-item"><a class="nav-link" href="#" data-page="catalog">Catálogo</a></li>
+                    </ul>
+                </div>
+              
+                <div class="d-flex align-items-center ms-lg-auto">
+                    <div class="position-relative me-3">
+                        <input id="search-input" class="form-control" type="search" placeholder="Buscar..." aria-label="Search">
+                        <div id="search-results" class="list-group w-100"></div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img id="profile-avatar-nav" src="" alt="Avatar de perfil" width="32" height="32" class="rounded-circle">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end text-small">
+                            <li><a id="settings-link" class="dropdown-item" href="#">Configuración</a></li>
+                            <li><a class="dropdown-item" href="#">Ayuda</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a id="logout-btn" class="dropdown-item" href="#">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="home-page">
+            <header id="hero-section">
+                 <div class="skeleton skeleton-hero h-100"></div>
+                 <div class="hero-content-wrapper d-none">
+                    <div class="container-fluid hero-content">
+                        <h1 id="hero-title" class="hero-title"></h1>
+                        <p id="hero-description" class="hero-description my-4"></p>
+                        <div class="d-flex align-items-center gap-3 hero-buttons">
+                            <button id="hero-play-btn" class="btn btn-light btn-lg"><i class="bi bi-play-fill"></i> Reproducir</button>
+                            <button id="hero-info-btn" class="btn btn-secondary btn-lg bg-opacity-50"><i class="bi bi-info-circle"></i> Más información</button>
+                            <span id="hero-rating" class="rating-badge fw-bold"></span>
+                        </div>
+                    </div>
+                 </div>
+            </header>
+            <main id="category-sections" class="container-fluid"></main>
+        </div>
+
+        <div id="catalog-page" class="container-fluid py-5 d-none">
+            <h1 class="mb-4">Catálogo de Contenido</h1><div class="row mb-4"><div class="col-md-3"><select id="catalog-genre-filter" class="form-select"></select></div><div class="col-md-3"><select id="catalog-year-filter" class="form-select"></select></div><div class="col-md-3"><select id="catalog-type-filter" class="form-select"><option value="movie">Películas</option><option value="tv">Series</option></select></div><div class="col-md-3"><button id="reset-filters-btn" class="btn btn-outline-secondary w-100">Limpiar Filtros</button></div></div><div id="catalog-grid" class="row g-3"></div><nav id="catalog-pagination" class="mt-5 d-flex justify-content-center"></nav>
+        </div>
+
+        <div id="my-list-page" class="container-fluid py-5 d-none">
+             <h1 class="mb-4">Mi Lista</h1>
+             <div id="my-list-grid" class="row g-3"></div>
+        </div>
+
+        <div id="settings-page" class="container py-5 d-none">
+            <h1 class="mb-5">Configuración de la Cuenta</h1>
+            <div class="row g-5">
+                <div class="col-md-6">
+                    <h3 class="mb-4">Administrar Perfiles</h3>
+                    <div id="settings-profiles-container" class="vstack gap-3"></div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="mb-4">Detalles de la Cuenta</h3>
+                    <div class="card bg-dark"><div class="card-body"><p><strong>Email:</strong> <span id="settings-email"></span></p><p><strong>Plan:</strong> <span id="settings-plan" class="badge bg-danger"></span></p><hr><button class="btn btn-outline-light mb-2 w-100">Cambiar contraseña</button><button class="btn btn-outline-light w-100">Administrar información de pago</button></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ FOOTER MEJORADO ESTILO NETFLIX -->
+<footer class="main-footer container-fluid mt-5">
+    <div class="footer-content mx-auto">
+        <div class="social-links mb-4">
+            <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+        </div>
+        
+        <div class="footer-grid">
+            <div class="footer-column">
+                <a href="#">Audio y subtítulos</a>
+                <a href="#">Prensa</a>
+                <a href="#">Privacidad</a>
+                <a href="#">Contáctanos</a>
+            </div>
+            <div class="footer-column">
+                <a href="#">Audiodescripción</a>
+                <a href="#">Relaciones con inversores</a>
+                <a href="#">Avisos legales</a>
+            </div>
+            <div class="footer-column">
+                <a href="#">Centro de ayuda</a>
+                <a href="#">Empleo</a>
+                <a href="#">Preferencias de cookies</a>
+            </div>
+            <div class="footer-column">
+                <a href="#">Tarjetas regalo</a>
+                <a href="#">Términos de uso</a>
+                <a href="#">Información corporativa</a>
+            </div>
+        </div>
+        
+        <button class="footer-service-code btn btn-sm btn-outline-secondary mt-4">Código de servicio</button>
+        
+        <p class="footer-copyright mt-3">
+            © 1997-2024 Cineflix, Inc.
+        </p>
+    </div>
+</footer>
+    </div>
+    
+    <div class="modal fade" id="detail-modal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body p-0"><div id="modal-content-loader" class="text-center p-5"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div><div id="modal-content-container" class="d-none"><div class="modal-body-content"><img id="modal-backdrop" src="" class="modal-backdrop-image" alt="Backdrop"><div class="modal-backdrop-overlay"></div></div><div class="p-4"><h1 id="modal-title" class="modal-title-custom"></h1><div class="d-flex align-items-center gap-3 my-3"><button id="modal-play-btn" class="btn btn-light"><i class="bi bi-play-fill"></i> Reproducir</button><button id="modal-add-list-btn" class="btn btn-outline-light rounded-circle" style="width: 40px; height: 40px;"></button><button id="modal-like-btn" class="btn btn-outline-light rounded-circle" style="width: 40px; height: 40px;"></button></div><p id="modal-overview"></p><div class="d-flex flex-wrap gap-2 mb-3"><span class="badge bg-secondary">Año: <span id="modal-year"></span></span><span class="badge bg-secondary">Duración: <span id="modal-runtime"></span></span><span class="badge bg-secondary">Idioma: <span id="modal-language"></span></span></div><div id="modal-genres" class="d-flex flex-wrap gap-2"></div><div id="modal-trailer-container" class="mt-4"></div></div></div></div></div></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
