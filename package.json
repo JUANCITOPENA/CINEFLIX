@@ -1,0 +1,26 @@
+{
+  "name": "cineflix",
+  "version": "1.0.0",
+  "description": "![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Version](https://img.shields.io/badge/version-1.0.0-green.svg) ![Status](https://img.shields.io/badge/status-active-success.svg)",
+  "main": "config.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JUANCITOPENA/CINEFLIX.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JUANCITOPENA/CINEFLIX/issues"
+  },
+  "homepage": "https://github.com/JUANCITOPENA/CINEFLIX#readme",
+  "devDependencies": {
+    "vite": "^7.3.0"
+  }
+}

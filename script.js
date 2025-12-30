@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONFIGURACIÓN Y ESTADO INICIAL ---
-    // LA VARIABLE 'API_KEY' AHORA VIENE DEL ARCHIVO config.js
+    const API_KEY = import.meta.env.VITE_API_KEY;
     const API_BASE_URL = 'https://api.themoviedb.org/3';
     const IMG_BASE_URL = 'https://image.tmdb.org/t/p/';
 
