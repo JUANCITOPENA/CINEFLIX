@@ -76,70 +76,203 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>`; }
-    async function renderCarousels() { const container = document.getElementById('category-sections'); container.innerHTML = ''; const categories = [ { title: 'Populares en Cineflix', endpoint: 'movie/popular' }, { title: 'Series de TV Aclamadas', endpoint: 'tv/top_rated' }, { title: 'Próximos Estrenos', endpoint: 'movie/upcoming' }, { title: 'Tendencias de la Semana', endpoint: 'trending/all/week' }]; for (const category of categories) { const row = document.createElement('div'); row.className = 'category-row'; row.innerHTML = `<h3 class="category-title">${category.title}</h3>`; const carouselContainer = document.createElement('div'); carouselContainer.innerHTML = createSkeletonCards(); row.appendChild(carouselContainer); container.appendChild(row); const data = await fetchTMDB(category.endpoint); if (data && data.results) { const carousel = document.createElement('div'); carousel.className = 'movie-carousel'; carousel.innerHTML = data.results.map(createMovieCard).join(''); carouselContainer.innerHTML = ''; carouselContainer.appendChild(carousel); } } }
+    async function renderCarousels() { 
+        const container = document.getElementById('category-sections'); 
+        container.innerHTML = ''; 
+
+        const categories = [ 
+            { title: 'Populares en Cineflix', endpoint: 'movie/popular' }, 
+            { title: 'Series de TV Aclamadas', endpoint: 'tv/top_rated' }, 
+            { title: 'Próximos Estrenos', endpoint: 'movie/upcoming' }, 
+            { title: 'Tendencias de la Semana', endpoint: 'trending/all/week' },
+            { title: 'Acción y Aventura', endpoint: 'discover/movie', params: { with_genres: 28 } },
+            { title: 'Comedias para reír', endpoint: 'discover/movie', params: { with_genres: 35 } }
+        ]; 
+
+        for (const [index, category] of categories.entries()) { 
+            // Crear estructura base (Título + Contenedor Relativo)
+            const row = document.createElement('div'); 
+            row.className = 'category-row'; 
+            
+            // HTML con Flechas de Navegación
+            row.innerHTML = `
+                <h3 class="category-title" style="margin-left: 4%; margin-bottom: 0.5rem;">${category.title}</h3>
+                <div class="carousel-container group">
+                    <button class="carousel-handle handle-left" id="prev-${index}">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    
+                    <div class="movie-carousel" id="carousel-${index}">
+                        ${createSkeletonCards()}
+                    </div>
+                    
+                    <button class="carousel-handle handle-right" id="next-${index}">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            `; 
+            
+            container.appendChild(row); 
+
+            // Cargar datos
+            const data = await fetchTMDB(category.endpoint, category.params || {}); 
+            
+            if (data && data.results) { 
+                const carousel = document.getElementById(`carousel-${index}`);
+                carousel.innerHTML = data.results.map(createMovieCard).join(''); 
+                
+                // --- LÓGICA DE NAVEGACIÓN (SCROLL) ---
+                const btnPrev = document.getElementById(`prev-${index}`);
+                const btnNext = document.getElementById(`next-${index}`);
+                
+                // Ocultar botón izquierdo al inicio
+                btnPrev.style.display = 'none';
+
+                const handleScroll = (direction) => {
+                    const scrollAmount = carousel.clientWidth * 0.9; // Desplazar el 90% del ancho visible
+                    if (direction === 'left') {
+                        carousel.scrollLeft -= scrollAmount;
+                    } else {
+                        carousel.scrollLeft += scrollAmount;
+                    }
+                };
+
+                btnPrev.addEventListener('click', () => handleScroll('left'));
+                btnNext.addEventListener('click', () => handleScroll('right'));
+
+                // Monitorizar scroll para mostrar/ocultar flecha izquierda
+                carousel.addEventListener('scroll', () => {
+                    if (carousel.scrollLeft > 50) {
+                        btnPrev.style.display = 'flex';
+                    } else {
+                        btnPrev.style.display = 'none';
+                    }
+                });
+            } 
+        } 
+    }
     async function renderGenresDropdown() { const dropdown = document.getElementById('genres-dropdown'); const data = await fetchTMDB('genre/movie/list'); if(data && data.genres) { dropdown.innerHTML = data.genres.map(genre => `<li><a class="dropdown-item" href="#" data-page="catalog" data-filter="genre" data-genre-id="${genre.id}">${genre.name}</a></li>`).join(''); } }
     
-    // ✅ FUNCIÓN DE MODAL ARREGLADA Y MEJORADA
+    // ✅ FUNCIÓN DE MODAL COMPLETAMENTE MEJORADA (ESTILO NETFLIX FULL)
     async function openDetailModal(mediaId, mediaType, play = false) {
         const loader = document.getElementById('modal-content-loader');
         const contentContainer = document.getElementById('modal-content-container');
         
+        // Reset y mostrar loader
         loader.classList.remove('d-none');
         contentContainer.classList.add('d-none');
         detailModal.show();
         
-        // Hacemos dos llamadas: una para los detalles, otra para los videos. Es más fiable.
-        const [details, videosResponse] = await Promise.all([
+        // --- 1. PETICIONES EN PARALELO ---
+        const [details, videosResponse, creditsResponse, recommendationsResponse] = await Promise.all([
             fetchTMDB(`${mediaType}/${mediaId}`),
-            fetchTMDB(`${mediaType}/${mediaId}/videos`)
+            fetchTMDB(`${mediaType}/${mediaId}/videos`),
+            fetchTMDB(`${mediaType}/${mediaId}/credits`),
+            fetchTMDB(`${mediaType}/${mediaId}/recommendations`)
         ]);
 
-        if (!details) {
-            detailModal.hide();
-            return;
-        }
+        if (!details) { detailModal.hide(); return; }
 
         const videos = videosResponse?.results || [];
-        
-        // Búsqueda de tráiler más insistente
-        const trailer = 
-            videos.find(v => v.type === 'Trailer' && v.iso_639_1 === 'es' && v.site === 'YouTube') || // Trailer oficial en español
-            videos.find(v => v.type === 'Trailer' && v.site === 'YouTube') || // Trailer oficial en cualquier idioma
-            videos.find(v => v.type === 'Teaser' && v.site === 'YouTube') || // Teaser si no hay trailer
-            videos.find(v => v.site === 'YouTube'); // Cualquier video de YouTube si no hay nada más
+        const cast = creditsResponse?.cast || [];
+        const crew = creditsResponse?.crew || [];
+        const recommendations = recommendationsResponse?.results || [];
 
+        // --- 2. RENDERIZADO INFO PRINCIPAL ---
         document.getElementById('modal-backdrop').src = details.backdrop_path ? `${IMG_BASE_URL}original${details.backdrop_path}` : 'https://via.placeholder.com/800x450';
         document.getElementById('modal-title').textContent = details.title || details.name;
-        document.getElementById('modal-overview').textContent = details.overview || "No hay sinopsis disponible.";
+        document.getElementById('modal-overview').textContent = details.overview || "Sinopsis no disponible.";
         document.getElementById('modal-year').textContent = (details.release_date || details.first_air_date || 'N/A').substring(0, 4);
-        document.getElementById('modal-runtime').textContent = details.runtime ? `${details.runtime} min` : (details.number_of_seasons ? `${details.number_of_seasons} temp.` : 'N/A');
-        document.getElementById('modal-language').textContent = details.original_language.toUpperCase();
-        document.getElementById('modal-genres').innerHTML = details.genres.map(g => `<span class="badge bg-danger">${g.name}</span>`).join(' ');
+        document.getElementById('modal-runtime').textContent = details.runtime ? `${details.runtime} min` : (details.number_of_seasons ? `${details.number_of_seasons} Temporadas` : 'N/A');
+        
+        // Listas simples
+        const genresList = details.genres.map(g => g.name).join(', ');
+        const castList = cast.slice(0, 4).map(c => c.name).join(', ');
+        
+        document.getElementById('modal-genres-list').textContent = genresList;
+        document.getElementById('modal-cast').textContent = castList;
+
+        // --- 3. TRAILER ---
+        const trailer = 
+            videos.find(v => v.type === 'Trailer' && v.iso_639_1 === 'es' && v.site === 'YouTube') ||
+            videos.find(v => v.type === 'Trailer' && v.site === 'YouTube') ||
+            videos.find(v => v.site === 'YouTube');
 
         const trailerContainer = document.getElementById('modal-trailer-container');
         if (trailer) {
             trailerContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${trailer.key}?autoplay=${play ? 1 : 0}&controls=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            trailerContainer.style.display = 'block';
         } else {
-            // Si después de todo no se encuentra, busca en YouTube con el título
-            const youtubeSearchUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(details.title || details.name + ' trailer español')}`;
-            trailerContainer.innerHTML = `<iframe src="${youtubeSearchUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            trailerContainer.style.display = 'block';
-            console.log(`No se encontró tráiler oficial, mostrando búsqueda en YouTube para: "${details.title || details.name}"`);
+             const youtubeSearchUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(details.title || details.name + ' trailer español')}`;
+             trailerContainer.innerHTML = `<iframe src="${youtubeSearchUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
         }
+
+        // --- 4. RENDERIZADO: MÁS TÍTULOS SIMILARES ---
+        const recGrid = document.getElementById('modal-recommendations-grid');
+        recGrid.innerHTML = '';
         
+        if (recommendations.length > 0) {
+            recommendations.slice(0, 6).forEach(rec => {
+                if (!rec.backdrop_path) return; // Saltar si no tiene imagen
+                
+                const recCard = document.createElement('div');
+                recCard.className = 'col-6 col-md-4'; // Grid de 2 en móvil, 3 en desktop
+                recCard.innerHTML = `
+                    <div class="recommendation-card" onclick="document.dispatchEvent(new CustomEvent('openModal', {detail:{id:${rec.id}, type:'${mediaType}'}}))">
+                        <div class="recommendation-img-container">
+                            <img src="${IMG_BASE_URL}w500${rec.backdrop_path}" alt="${rec.title || rec.name}">
+                            <div class="position-absolute top-0 end-0 p-1">
+                                <span class="badge bg-dark bg-opacity-75">${(rec.vote_average || 0).toFixed(1)}</span>
+                            </div>
+                        </div>
+                        <div class="rec-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="text-white text-truncate mb-0" style="font-size: 0.9rem; max-width: 80%;">${rec.title || rec.name}</h6>
+                            </div>
+                             <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-secondary">${(rec.release_date || rec.first_air_date || '').substring(0,4)}</small>
+                                <button class="btn btn-outline-light rounded-circle btn-sm p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;"><i class="bi bi-plus"></i></button>
+                             </div>
+                            <p class="text-secondary mt-2 mb-0 text-truncate" style="font-size: 0.75rem;">${rec.overview}</p>
+                        </div>
+                    </div>
+                `;
+                recGrid.appendChild(recCard);
+            });
+        } else {
+            recGrid.innerHTML = '<p class="text-muted text-center w-100">No hay recomendaciones disponibles para este título.</p>';
+        }
+
+        // --- 5. RENDERIZADO: ACERCA DE ---
+        const aboutTitle = document.getElementById('modal-about-title');
+        const aboutContent = document.getElementById('modal-about-content');
+        aboutTitle.textContent = details.title || details.name;
+        
+        const director = crew.find(c => c.job === 'Director')?.name || 'No disponible';
+        const fullCast = cast.slice(0, 10).map(c => c.name).join(', ');
+        
+        aboutContent.innerHTML = `
+            <div><span class="about-label">Director:</span> <span class="about-value">${director}</span></div>
+            <div><span class="about-label">Elenco:</span> <span class="about-value">${fullCast}</span></div>
+            <div><span class="about-label">Guionistas:</span> <span class="about-value">${crew.filter(c => c.job === 'Writer' || c.department === 'Writing').slice(0, 3).map(c => c.name).join(', ') || 'N/A'}</span></div>
+            <div><span class="about-label">Géneros:</span> <span class="about-value">${genresList}</span></div>
+            <div><span class="about-label">Título original:</span> <span class="about-value text-secondary">${details.original_title || details.original_name}</span></div>
+            <div><span class="about-label">Clasificación por edad:</span> <span class="badge border border-secondary text-secondary">13+</span> <span class="about-value ms-1">Recomendado para mayores de 13 años</span></div>
+        `;
+
+        // --- 6. BOTONES ACCIÓN ---
         const addListBtn = document.getElementById('modal-add-list-btn');
         const likeBtn = document.getElementById('modal-like-btn');
         addListBtn.dataset.mediaId = details.id;
         addListBtn.dataset.mediaType = mediaType;
         likeBtn.dataset.mediaId = details.id;
         likeBtn.dataset.mediaType = mediaType;
-
         updateActionButtons(details.id, addListBtn, likeBtn);
 
+        // Finalizar carga
         loader.classList.add('d-none');
         contentContainer.classList.remove('d-none');
         
+        // Limpiar trailer al cerrar
         document.getElementById('detail-modal').addEventListener('hidden.bs.modal', () => {
              trailerContainer.innerHTML = '';
         }, { once: true });

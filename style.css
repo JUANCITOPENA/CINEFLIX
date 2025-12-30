@@ -120,17 +120,82 @@ body {
     padding: 0.5rem 1.5rem;
 }
 
-/* 6. CARRUSELES */
-.category-row { padding: 1rem 0 2rem 4%; }
-.category-title { font-size: clamp(1.2rem, 2.5vw, 1.5rem); font-weight: 700; margin-bottom: 1rem; }
-.movie-carousel { display: flex; overflow-x: auto; overflow-y: hidden; padding-bottom: 1rem; scrollbar-width: none; }
+/* 6. CARRUSELES Y CONTROLES (Estilo Netflix) */
+.category-row {
+    padding: 1rem 0 2rem 0; /* Padding ajustado */
+    position: relative;
+    margin-bottom: 1rem;
+}
+.category-row:hover .carousel-handle {
+    opacity: 1; /* Mostrar flechas al pasar el mouse sobre la fila */
+}
+
+.carousel-container {
+    position: relative;
+    padding: 0 4%; /* Alinear con el resto del contenido */
+}
+
+.movie-carousel {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0; /* Espacio para el efecto hover de las cards */
+    scrollbar-width: none;
+    scroll-behavior: smooth; /* Desplazamiento suave */
+}
 .movie-carousel::-webkit-scrollbar { display: none; }
+
+.carousel-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4%; /* Ancho de la zona de clic */
+    background-color: rgba(20, 20, 20, 0.5); /* Fondo oscuro semitransparente */
+    border: none;
+    color: #fff;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Oculto por defecto */
+    transition: background-color 0.2s, opacity 0.2s;
+    cursor: pointer;
+}
+
+.carousel-handle:hover {
+    background-color: rgba(20, 20, 20, 0.8);
+    color: #fff;
+}
+
+.carousel-handle i {
+    font-size: 2.5rem;
+    font-weight: bold;
+    transform: scale(1);
+    transition: transform 0.2s;
+}
+
+.carousel-handle:hover i {
+    transform: scale(1.2);
+}
+
+.handle-left {
+    left: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.handle-right {
+    right: 0;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
 .movie-card {
     flex: 0 0 auto;
     width: clamp(120px, 18vw, 200px);
     margin-right: 10px;
     background-color: #222;
-    border-radius: 5px;
+    border-radius: 4px; /* Borde más sutil estilo Netflix */
     overflow: hidden;
     position: relative;
     transition: transform 0.3s ease, z-index 0.3s ease;
@@ -138,10 +203,10 @@ body {
 }
 .movie-card:hover { transform: scale(1.15); z-index: 10; }
 .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-.movie-card-info { padding: 1rem; position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; }
+.movie-card-info { padding: 0.5rem; position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; }
 .movie-card:hover .movie-card-info { opacity: 1; }
-.card-buttons button { background-color: rgba(42, 42, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.7); color: white; width: 30px; height: 30px; border-radius: 50%; padding: 0; }
-.card-buttons button:hover { border-color: white; }
+.card-buttons button { background-color: rgba(42, 42, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.5); color: white; width: 32px; height: 32px; border-radius: 50%; padding: 0; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+.card-buttons button:hover { border-color: white; background-color: white; color: black; }
 
 /* SKELETON LOADERS */
 .skeleton { background: #333; background: linear-gradient(110deg, #222 8%, #333 18%, #222 33%); border-radius: 5px; background-size: 200% 100%; animation: 1.5s shine linear infinite; }
@@ -159,16 +224,82 @@ body {
 .modal-title-custom { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: bold; }
 
 /* ✅ REGLA DEL VIDEO CENTRADO Y DEFINITIVA */
-.modal-trailer-container iframe {
+#modal-trailer-container iframe {
     display: block !important;
-    width: 90% !important;
-    margin: 2rem auto 0 auto !important;
+    width: 100% !important;
+    margin: 1.5rem 0 0 0 !important;
     aspect-ratio: 16 / 9 !important;
-    border-radius: 8px !important;
+    border-radius: 4px !important;
     border: none !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
-/* BÚSQUEDA */
+/* Estilos para metadatos del modal (Estilo Netflix) */
+.metadata-line {
+    font-size: 1rem;
+}
+.hover-underline:hover {
+    text-decoration: underline;
+    color: #fff !important;
+}
+/* ESTILOS MODAL - SECCIONES EXTRA (Estilo Netflix) */
+
+.recommendation-card {
+    background-color: #2f2f2f;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s;
+    height: 100%;
+}
+
+.recommendation-card:hover {
+    background-color: #404040;
+    transform: scale(1.02);
+}
+
+.recommendation-img-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9; /* Formato paisaje como en recomendaciones de Netflix */
+}
+
+.recommendation-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recommendation-title {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+    opacity: 0; /* Solo mostrar si no hay poster o al hover si quisieras */
+}
+
+.rec-body {
+    padding: 1rem;
+    color: #d2d2d2;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.about-label {
+    color: #777;
+    margin-right: 5px;
+}
+.about-value {
+    color: #fff;
+    cursor: pointer;
+}
+.about-value:hover { text-decoration: underline; }
 #search-results {
     position: absolute;
     top: 100%;
